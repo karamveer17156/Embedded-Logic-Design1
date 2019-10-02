@@ -1,0 +1,58 @@
+module FSM_TOP(
+    input [3:0] x,
+    input[3:0] y,
+    input clk,
+    input go,
+    input clr,
+    output [7:0] cathode,
+    output [3:0] anode
+    
+    );
+    wire clk_190, clk_250;
+    wire clrr, goo, go1;
+    clk_div c1(.clk(clk),.out_clk(clk_190));
+    clk_div #(2) c2(.clk(clk),.out_clk(clk_250));
+//go is pulse
+    debounce dbc(.clk(clk_190),.deb_in(clr),.deb_out(clrr));
+    
+    pulse p1(.clk(clk_250),.deb_in(go),.deb_out(go1));
+    wire [3:0] ones, tens;
+    wire [3:0] gcd;
+    wire xmsel, ymsel, xld, yld, gld, eqflg, ltflg;
+
+          
+    Control_unit cntrl1(
+                        .clk(clk_250),
+                        .clr(clrr),
+                        .go(go1),
+                        .eqflag(eqflg),
+                        .ltflag(ltflg),
+                        .xmsel(xmsel),
+                        .ymsel(ymsel),
+                        .xld(xld),
+                        .yld(yld),
+                        .gld(gld)
+                       );
+                       
+        Datapath dat1(    
+                        .clk(clk_250),
+                        .clr(clrr),
+                        .xmsel(xmsel),
+                        .ymsel(ymsel),
+                        .xld(xld),
+                        .yld(yld),
+                        .gld(gld),
+                        .xin(x),
+                        .yin(y),
+                        .eqflg(eqflg),
+                        .ltflg(ltflg),
+                        .gcd(gcd)
+                        );                   
+    bin2bcd bc1(.number(gcd),.ones(ones), .tens(tens));
+    sevenseg_all sg1(.clk(clk),.ones(ones),.tens(tens),.hundreds(0),.thousands(0) ,.cathode(cathode),.anode(anode));
+    
+        
+    //make 3 modules.. FSM_TOP, Data_path, control_line
+
+    
+Endmodule
