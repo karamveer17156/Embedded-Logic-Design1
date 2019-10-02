@@ -1,0 +1,113 @@
+`timescale 1ns / 1ps
+module Datapath(
+    input clk,
+    input clr,
+    input xmsel,
+    input ymsel,
+    input xld,
+    input yld,
+    input gld,
+    input [3:0] xin ,
+    input [3:0] yin,
+    output reg eqflg =0,
+    output reg ltflg ,
+    output reg[3:0] gcd = 0
+    );
+    //
+    reg[3:0]  x1, y1,x,y ;
+    wire[3:0] xmy, ymx;
+    //reg[3:0] xreg , yreg, gcd_reg ;
+     assign xmy = x - y;
+       assign ymx = y - x;
+
+always@(posedge clk or posedge clr)
+begin
+    if(clr)
+    x<= 0;
+    else
+    begin
+        if(xld)
+        x<= x1;
+        
+    end
+end
+
+always@(posedge clk or posedge clr)
+begin
+    if(clr)
+    y<= 0;
+    else
+    begin
+        if(yld)
+        y<= y1;
+          end
+end
+
+always@(posedge clk or posedge clr)
+begin
+    if(clr)
+    gcd<= 0;
+    else
+    begin
+        if(gld)
+        gcd<= x;
+        
+    end
+end
+
+//mux mss2(
+//    .select(xmsel),
+//    .A0(xmy),
+//    .A1(xin),
+//    .Y(x1)
+//    );
+  
+//mux mss(
+//    .select(ymsel),
+//    .A0(ymx),
+//    .A1(yin),
+//    .Y(y1)
+//    ); 
+
+always@(*)
+begin
+    if(xmsel==1)
+        x1<= xin;
+    else
+        x1<= xmy;    
+end
+
+always@(*)
+begin
+    if(ymsel==1)
+        y1<= yin;
+    else
+        y1<= ymx;    
+end
+    
+   
+
+
+
+
+ always@(*)
+    begin
+    if(x==y)
+    eqflg <= 1;
+    else
+    eqflg <= 0;  
+    end
+    
+    always@(*)
+    begin
+      if(x<y)
+     ltflg <= 1;
+    else
+     ltflg <= 0;
+    end
+    
+    
+   
+  
+  
+endmodule
